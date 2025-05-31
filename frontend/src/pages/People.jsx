@@ -16,6 +16,8 @@ const People = () => {
     fetchGroupSets();
   }, [classroomId]);
 
+  /* The following features will fetch the students and the groups for the specific classrooms */
+
   const fetchStudents = async () => {
     try {
       const res = await axios.get(`/api/classroom/${classroomId}/students`);
@@ -35,6 +37,7 @@ const People = () => {
   };
 
   return (
+    // 
     <div className="p-6 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">People</h1>
       <div className="flex space-x-4 mb-6">
@@ -61,20 +64,21 @@ const People = () => {
               <div key={student._id} className="border p-3 rounded shadow flex justify-between items-center">
                 <span>{student.name || student.email} - Role: {student.role}</span>
                 {user.role === 'teacher' && student.role === 'student' && (
+                  // Make Admin button still not works
                   <button
                     className="btn btn-sm btn-secondary"
                     onClick={async () => {
                       try {
                         await axios.post(`/api/users/${student._id}/make-admin`, {}, { withCredentials: true });
                         alert('Student promoted to admin');
-                        fetchStudents(); // refresh
+                        fetchStudents(); // refresh in real time 
                       } catch (err) {
                         console.error('Failed to promote student', err);
                         alert('Error promoting student');
                       }
                     }}
                   >
-                    Make Admin
+                    Make Admin 
                   </button>
                 )}
               </div>

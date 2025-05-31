@@ -15,6 +15,9 @@ const ClassroomPage = () => {
   const [joinClassroomCode, setJoinClassroomCode] = useState('');
   const navigate = useNavigate();
 
+  // The following functions were taken from Home.jsx to separate them in different pages.
+
+  // The use effectt are setting the role when loged and fetching the classrooms they are i
   useEffect(() => {
     setRole(user?.role || '');
   }, [user]);
@@ -23,6 +26,7 @@ const ClassroomPage = () => {
     if (role) fetchClassrooms();
   }, [role]);
 
+  //  This will fetch all the classrooms under that databse 
   const fetchClassrooms = async () => {
     try {
       const endpoint = role === 'teacher' ? '/api/classroom' : '/api/classroom/student';
@@ -33,6 +37,7 @@ const ClassroomPage = () => {
     }
   };
 
+  // The function will handle how to create a classroom will need a name and a code
   const handleCreateClassroom = async () => {
     if (!classroomName.trim() || !classroomCode.trim()) {
       // alert('Please enter both name and code.');
@@ -55,6 +60,7 @@ const ClassroomPage = () => {
     }
   };
 
+  // joining a classroom will require the code that the classroom was created with
   const handleJoinClassroom = async () => {
     if (!joinClassroomCode.trim()) {
       // alert('Enter a classroom code');
@@ -73,11 +79,14 @@ const ClassroomPage = () => {
     }
   };
 
+
+  //  Will navigate to the clasroom the user clicks
   const handleCardClick = (id) => {
     navigate(`/classroom/${id}`);
     toast.success('Entered classroom!');
   };
 
+  // These features will focus from the teacher side regarding the classroom update
   useEffect(() => {
     socket.on('classroom_update', updated => {
       setClassrooms(prev =>
@@ -101,7 +110,7 @@ const ClassroomPage = () => {
     <>
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold text-center">Classroom Dashboard</h1>
-
+        {/* This will be only what teacher will see */}
         {role === 'teacher' && (
           <div className="space-y-2">
             <input
@@ -123,7 +132,7 @@ const ClassroomPage = () => {
             </button>
           </div>
         )}
-
+        {/* This will be only what the student will see for the classroom (making sure to only see join clasrrom instead of creating) */}
         {role === 'student' && (
           <div className="space-y-2">
             <input
@@ -138,7 +147,7 @@ const ClassroomPage = () => {
             </button>
           </div>
         )}
-
+        {/* Classrooms need some css refinement when hovering over. We will work on it on prototype 2 */}
         <div>
           <h2 className="text-xl font-semibold mt-6">Classrooms</h2>
           <div className="grid gap-4 md:grid-cols-2 mt-2">

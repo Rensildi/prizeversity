@@ -25,6 +25,9 @@ const App = () => {
   }, [user]);
 
   return (
+    // Added the navigation bar and notification bell in App.jsx 
+    // This way we removed redundancy to call it in each page.
+    // This method will prevent for navigation and the bell to show in the login page (meaning without a user being logged in)
     <div>
       {user && <Navbar />}
       {user && <NotificationBell />}

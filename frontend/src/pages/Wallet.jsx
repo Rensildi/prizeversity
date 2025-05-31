@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+// AuthContext.jsx is needed for verifications regarding transactions and amonut very important
 import { useAuth } from '../context/AuthContext'; // Don't forget this!
 
 const Wallet = () => {

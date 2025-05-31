@@ -19,13 +19,17 @@ const Home = () => {
   // Fetch the user's role and classrooms on component mount
   useEffect(() => {
     if (user) {
-      console.log('Fetched User:', user); // Log the fetched user
+      // Check if the user that was fetched i logged
+      console.log('Fetched User:', user);
       if (user.role) {
-        console.log('User Role:', user.role); // Log the user role
+        // checking if the user role is fetched
+        console.log('User Role:', user.role);
         setRole(user.role);
-        fetchClassrooms(); // Fetch classrooms when the user role is set
+         // Fetch classrooms when the user role is set
+        fetchClassrooms();
       } else {
-        console.log('No role assigned to user'); // Log if no role is assigned
+        // Adding console logs regarding if no role is assinged to the user.
+        console.log('No role assigned to user'); 
       }
     }
   }, [user]);
@@ -35,7 +39,7 @@ const Home = () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('session_expired')) {
       alert('Your session has expired. Please sign in again.');
-      // Remove the parameter from URL
+      // Removed the parameter from URL --> will fix the issue regarding the classroom layers 
       window.history.replaceState({}, '', '/');
     }
   }, []);
@@ -55,8 +59,10 @@ const Home = () => {
   const handleRoleSelection = async (selectedRole) => {
     try {
       const response = await axios.post('/api/auth/update-role', { role: selectedRole });
-      setRole(selectedRole); // Update the role in the state
-      setUser(response.data.user); // Update the user in the AuthContext
+      // update the role in the use state
+      setRole(selectedRole); 
+      // update the user in the AuthContext.js
+      setUser(response.data.user);
     } catch (err) {
       console.error('Failed to update role', err);
     }
@@ -81,6 +87,7 @@ const Home = () => {
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         alert(err.response.data.error); // Will show "A classroom with this code already exists" or other specific errors
+        // will add toast errors in the future 
       } else {
         console.error('Failed to create classroom', err);
         alert('Failed to create classroom');
@@ -103,6 +110,7 @@ const Home = () => {
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         alert(err.response.data.error); // Will show "Invalid classroom code" or "Already joined" messages
+        // Will add toast errors in the future
       } else {
         console.error('Failed to join classroom', err);
         alert('Failed to join classroom');

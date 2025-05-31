@@ -1,3 +1,4 @@
+/* replaced old css with the tailwindss */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
