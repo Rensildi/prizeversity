@@ -9,6 +9,7 @@ const Groups = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // these const state variables will be managing groups and group sets (not yet have been put to implementation yet)
   const [groupSets, setGroupSets] = useState([]);
   const [groupSetName, setGroupSetName] = useState('');
   const [groupSetSelfSignup, setGroupSetSelfSignup] = useState(false);
@@ -26,6 +27,10 @@ const Groups = () => {
   const [memberSorts, setMemberSorts] = useState({});
   const [memberSearches, setMemberSearches] = useState({});
 
+
+  // Moved all the functions from the Classroom.jsx related to the group functionalities
+
+  // Will get the group sets and join the socket room for the classroom 
   useEffect(() => {
     fetchGroupSets();
     socket.emit('join', `classroom-${id}`);
@@ -35,6 +40,8 @@ const Groups = () => {
     };
   }, [id]);
 
+
+  // Will fetch group sets for the classroom 
   const fetchGroupSets = async () => {
     try {
       const res = await axios.get(`/api/group/groupset/classroom/${id}`);
@@ -44,6 +51,7 @@ const Groups = () => {
     }
   };
 
+  // Teacher will be the only one that will be able to crate Group Set
   const handleCreateGroupSet = async () => {
     try {
       await axios.post('/api/group/groupset/create', {
@@ -54,6 +62,7 @@ const Groups = () => {
         maxMembers: groupSetMaxMembers,
         image: groupSetImage,
       });
+      // Will refresh the list and reset the inputs from the previous creation
       fetchGroupSets();
       setGroupSetName('');
       setGroupSetSelfSignup(false);
@@ -65,6 +74,7 @@ const Groups = () => {
     }
   };
 
+  // The groups will be crated within the groupset that is specfici choosen
   const handleCreateGroup = async (groupSetId) => {
     if (!groupName.trim()) return alert('Group name required');
     try {
@@ -80,6 +90,7 @@ const Groups = () => {
     }
   };
 
+  // Students will have the option to join the specific group (later on will add a timeline for the Teacher where they can see students that are not in a group by the deadline (also created by the professor))
   const handleJoinGroup = async (groupSetId, groupId) => {
     try {
       await axios.post(`/api/group/groupset/${groupSetId}/group/${groupId}/join`);
@@ -89,6 +100,8 @@ const Groups = () => {
     }
   };
 
+
+  // The option of leaving the group
   const handleLeaveGroup = async (groupSetId, groupId) => {
     try {
       await axios.post(`/api/group/groupset/${groupSetId}/group/${groupId}/leave`);
@@ -98,6 +111,8 @@ const Groups = () => {
     }
   };
 
+
+  // It will be able to filter, search and sort group memebrs but this is not yet implemented in the Group page
   const getFilteredAndSortedMembers = (group) => {
     const filter = memberFilters[group._id] || 'all';
     const sort = memberSorts[group._id] || 'email';
@@ -113,6 +128,8 @@ const Groups = () => {
       });
   };
 
+
+  // Adding all the UI for the functions above
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-4">Group Management</h1>
