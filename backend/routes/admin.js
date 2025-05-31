@@ -15,6 +15,25 @@ router.get('/users', ensureAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
+// view all admins
+router.get('/admins', ensureAuthenticated, isAdmin, async(req, res) => {
+    try {
+        const admins = await User.find({ role: 'admin'}).select('-password');
+        res.json(admins);
+    } catch (error) {
+        res.status(500).json({error: 'Internal Server Error!'});
+    }
+});
+
+// view all classrooms
+router.get('/classrooms', ensureAuthenticated, isAdmin, async(req, res) => {
+    try {
+        const classrooms = await Classroom.find().populate('teacher').populate('students')
+        res.json(classrooms);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch classrooms'});
+    }
+})
 
 // Here more functionalities will be implemented
 // Manage classrooms
