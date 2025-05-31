@@ -11,6 +11,8 @@ const bazaarRoutes = require('./routes/bazaar');
 const walletRoutes = require('./routes/wallet');
 const groupRoutes = require('./routes/group');
 const notificationsRoutes = require('./routes/notifications');
+// Importing admin route
+const adminRoutes = require('./routes/admin'); 
 require('dotenv').config();
 
 const app = express();
@@ -24,7 +26,10 @@ const io = new Server(httpServer, {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost5173',
+  credentials: true,
+}));
 app.use(express.json());
 
 // Session Middleware
@@ -54,6 +59,7 @@ app.use('/api/bazaar', bazaarRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root Route
 app.get('/', (req, res) => {
