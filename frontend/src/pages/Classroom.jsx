@@ -5,6 +5,9 @@ import { useAuth } from '../context/AuthContext';
 import '../styles/MemberManagement.css';
 import socket from '../utils/socket';
 
+import toast from 'react-hot-toast';
+import { LoaderIcon } from 'lucide-react';
+
 const Classroom = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -248,9 +251,11 @@ const Classroom = () => {
       });
       
       if (response.data.message === 'No changes were made') {
-        alert('No changes were made');
+        // alert('No changes were made');
+        toast.error('No changes were made!');
       } else {
-        alert('Classroom updated successfully!');
+        // alert('Classroom updated successfully!');
+        toast.success('Classroom updated successfully!');
         setEditingClassroom(false);
         setUpdateClassroomName('');
         setUpdateClassroomImage('');
@@ -507,11 +512,13 @@ const Classroom = () => {
   const handleLeaveClassroom = async () => {
     try {
       await axios.post(`/api/classroom/${id}/leave`);
-      alert('Left classroom successfully!');
-      navigate('/');
+      // alert('Left classroom successfully!');
+      toast.success('Left classroom successfully!');
+      navigate('/classrooms');
     } catch (err) {
       console.error('Failed to leave classroom', err);
-      alert('Failed to leave classroom');
+      // alert('Failed to leave classroom');
+      toast.error("Failed to leave classroom!");
     }
   };
 
@@ -591,11 +598,13 @@ const Classroom = () => {
     if (window.confirm(`You are about to leave the classroom "${classroom.name}". If you're a member of any group(s) in this classroom, you will be automatically removed. Are you sure you want to proceed?`)) {
       try {
         await axios.post(`/api/classroom/${id}/leave`);
-        alert('Left classroom successfully!');
-        navigate('/');
+        // alert('Left classroom successfully!');
+        toast.success('Left classroom successfully!');
+        navigate('/classrooms');
       } catch (err) {
         console.error('Failed to leave classroom', err);
-        alert('Failed to leave classroom');
+        // alert('Failed to leave classroom');
+        toast.error('Failed to leave classroom!');
       }
     }
   };
@@ -604,11 +613,13 @@ const Classroom = () => {
     if (window.confirm(`You're about to delete classroom "${classroom.name}". All data will be purged! Are you sure you want to proceed?`)) {
       try {
         await axios.delete(`/api/classroom/${id}`);
-        alert('Classroom deleted successfully!');
-        navigate('/');
+        // alert('Classroom deleted successfully!');
+        toast.success('Classroom deleted successfully!');
+        navigate('/classrooms');
       } catch (err) {
         console.error('Failed to delete classroom', err);
-        alert('Failed to delete classroom');
+        // alert('Failed to delete classroom');
+        toast.error('Failed to delete classroom!');
       }
     }
   };
@@ -756,8 +767,12 @@ const handleSearchChange = (groupId, value) => {
 
   // Add loading check at the start of render
   if (loading || !user) {
-    return <div>Loading...</div>;
-  }
+    return (
+    <div className='min-h-screen bg-base-200 flex items-center justify-center'>
+      <LoaderIcon className='animate-spin, size-10' />
+    </div>
+    );
+  };
 
   if (!user) {
     return <div>Please log in to view this classroom.</div>;
@@ -767,13 +782,19 @@ const handleSearchChange = (groupId, value) => {
     return <div>Loading classroom details...</div>;
   }
 
-  if (!classroom) return <div>Loading...</div>;
+  if (!classroom) {
+    return (
+      <div className='min-h-screen bg-base-200 flex items-center justify-center'>
+        <LoaderIcon className='animate-spin, size-10' />
+      </div>
+    );
+  };
 
   return (
     <div>
       <h1>{classroom.name}</h1>
       <p>Class Code: {classroom.code}</p>
-      {user.role === 'teacher' && (
+      {(user.role === 'teacher' || user.role === 'admin') && (
         <div>
           {editingClassroom ? (
             <div>
@@ -796,41 +817,14 @@ const handleSearchChange = (groupId, value) => {
           ) : (
             <button onClick={() => setEditingClassroom(true)}>Edit Classroom</button>
           )}
+
           <button onClick={handleLeaveClassroomConfirm}>Leave Classroom</button>
-          <button onClick={handleDeleteClassroomConfirm}>Delete Classroom</button>
-          <div>
-            <h4>Create Bazaar</h4>
-            <input
-              type="text"
-              placeholder="Bazaar Name"
-              value={bazaarName}
-              onChange={(e) => setBazaarName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Description"
-              value={bazaarDescription}
-              onChange={(e) => setBazaarDescription(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Image URL"
-              value={bazaarImage}
-              onChange={(e) => setBazaarImage(e.target.value)}
-            />
-            <button onClick={handleCreateBazaar}>Create Bazaar</button>
-          </div>
-          <div>
-            <h3>Bazaars</h3>
-            <ul>
-              {bazaars.map((bazaar) => (
-                <li key={bazaar._id}>
-                  <h4>{bazaar.name}</h4>
-                  <p>{bazaar.description}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+
+          {user.role === 'teacher' && (
+            <button onClick={handleDeleteClassroomConfirm}>Delete Classroom</button>
+          )}
+
+          
           <div>
             <h3>Students</h3>
             <ul>
@@ -1052,15 +1046,6 @@ const handleSearchChange = (groupId, value) => {
       {user.role === 'student' && (
         <div>
           <button onClick={handleLeaveClassroomConfirm}>Leave Classroom</button>
-          <h3>Bazaars</h3>
-          <ul>
-            {bazaars.map((bazaar) => (
-              <li key={bazaar._id}>
-                <h4>{bazaar.name}</h4>
-                <p>{bazaar.description}</p>
-              </li>
-            ))}
-          </ul>
           <div>
             <h3>Group Sets</h3>
             <ul>

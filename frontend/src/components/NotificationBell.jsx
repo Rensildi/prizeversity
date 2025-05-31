@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { CSSTransition } from 'react-transition-group';
 import { subscribeToNotifications } from '../utils/socket';
-import './NotificationBell.css';
+// import './NotificationBell.css';
+
+import { Bell } from 'lucide-react';
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
@@ -104,39 +106,46 @@ const NotificationBell = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="notification-bell" ref={dropdownRef}>
-      <div 
-        className="bell-icon" 
+    <div className="fixed top-3 right-3 z-[1000]" ref={dropdownRef}>
+      <div
+        className="relative bg-white rounded-full shadow-md p-2 cursor-pointer text-2xl hover:scale-110 transition-transform duration-200"
         onClick={() => setShowNotifications(!showNotifications)}
         role="button"
         tabIndex={0}
       >
-        🔔
-        {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
+      <Bell className='w-6 h-6 text-gray-800' />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-error text-white text-xs rounded-full px-1.5 animate-pulse">
+            {unreadCount}
+          </span>
+        )}
       </div>
-      
+
       <CSSTransition
         in={showNotifications}
         timeout={300}
         classNames="dropdown"
         unmountOnExit
-        nodeRef={nodeRef} // Add this prop
+        nodeRef={nodeRef}
       >
-        <div ref={nodeRef} className="notification-dropdown"> {/* Add ref here */}
-          <div className="notification-header">
-            <h3>Notifications</h3>
-            <div className="notification-controls">
+        <div
+          ref={nodeRef}
+          className="absolute right-0 mt-2 w-[350px] max-w-[90vw] bg-white rounded-xl shadow-xl"
+        >
+          <div className="p-4 border-b border-base-200">
+            <h3 className="text-lg font-semibold text-gray-800">Notifications</h3>
+            <div className="flex flex-wrap gap-3 mt-3">
               <input
                 type="text"
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                className="input input-bordered w-full sm:flex-1 min-w-[150px]"
               />
-              <select 
+              <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="sort-select"
+                className="select select-bordered"
               >
                 <option value="date">Sort by Date</option>
                 <option value="message">Sort by Message</option>
@@ -144,7 +153,7 @@ const NotificationBell = () => {
               <select
                 value={filterBy}
                 onChange={(e) => setFilterBy(e.target.value)}
-                className="filter-select"
+                className="select select-bordered"
               >
                 <option value="all">All</option>
                 <option value="group_approval">Approvals</option>
@@ -154,33 +163,36 @@ const NotificationBell = () => {
                 <option value="group_deletion,classroom_deletion,groupset_deletion">Deletions</option>
                 <option value="classroom_update,groupset_update,group_update">Updates</option>
               </select>
-              <button 
+              <button
                 onClick={handleDismissAll}
-                className="dismiss-all-button"
+                className="btn btn-outline btn-sm"
               >
                 Dismiss All
               </button>
             </div>
           </div>
 
-          <div className="notification-list">
+          <div className="max-h-[60vh] overflow-y-auto scroll-smooth divide-y divide-base-200">
             {paginatedNotifications.length > 0 ? (
               <>
                 {paginatedNotifications.map(notification => (
-                  <div 
-                    key={notification._id} 
-                    className={`notification-item ${notification.read ? 'read' : ''}`}
+                  <div
+                    key={notification._id}
+                    className={`flex justify-between items-start gap-3 p-4 transition-colors ${
+                      notification.read ? 'opacity-70' : 'hover:bg-base-100'
+                    }`}
                   >
-                    <div className="notification-content">
-                      <p>{notification.message}</p>
-                      <small>
-                        by {notification.actionBy.email} at {new Date(notification.createdAt).toLocaleString()} 
+                    <div className="flex-1">
+                      <p className="text-sm">{notification.message}</p>
+                      <small className="text-gray-500 block mt-1">
+                        by {notification.actionBy.email} at{' '}
+                        {new Date(notification.createdAt).toLocaleString()}
                         {notification.classroom && ` in classroom "${notification.classroom.name}"`}
                       </small>
                     </div>
                     {!notification.read && (
                       <button
-                        className="dismiss-button"
+                        className="text-lg text-gray-500 hover:text-error"
                         onClick={() => handleDismissNotification(notification._id)}
                         aria-label="Dismiss notification"
                       >
@@ -189,24 +201,26 @@ const NotificationBell = () => {
                     )}
                   </div>
                 ))}
-                <div className="pagination-controls">
-                  <button 
+                <div className="flex justify-center items-center gap-4 py-3 border-t border-base-200">
+                  <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
+                    className="btn btn-sm"
                   >
                     Previous
                   </button>
-                  <span>{currentPage} of {totalPages}</span>
-                  <button 
+                  <span className="text-sm text-gray-600">{currentPage} of {totalPages}</span>
+                  <button
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
+                    className="btn btn-sm"
                   >
                     Next
                   </button>
                 </div>
               </>
             ) : (
-              <div className="no-notifications">
+              <div className="p-4 text-center text-sm text-gray-500">
                 {searchTerm ? 'No matching notifications' : 'No notifications'}
               </div>
             )}

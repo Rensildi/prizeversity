@@ -13,6 +13,7 @@ const groupRoutes = require('./routes/group');
 const notificationsRoutes = require('./routes/notifications');
 // Importing admin route
 const adminRoutes = require('./routes/admin'); 
+const usersRoutes =  require('./routes/users');
 require('dotenv').config();
 
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', usersRoutes);
 
 // Root Route
 app.get('/', (req, res) => {

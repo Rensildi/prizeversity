@@ -35,6 +35,58 @@ router.get('/classrooms', ensureAuthenticated, isAdmin, async(req, res) => {
     }
 })
 
+// ban user
+router.patch('/ban/:userId', ensureAuthenticated, isAdmin, async (req,res) => {
+    try {
+        const user = await User.findByIdAndUpdate (
+            req.params.userId,
+            { isBanned: true},
+            { new: true }
+        );
+        res.json({ message: `${user.email} has been banned.`, user});
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to ban user!'});
+    }
+});
+
+// unban user
+router.patch('/unban/:userId', ensureAuthenticated, isAdmin, async(req,res) => {
+    try {
+        const user = await User.findByIdAndUpdate (
+            req.params.userId,
+            { isBanned: false},
+            { new: true}
+        );
+        res.json({message: `${user.email} has been un-banned.`, user});
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to un-ban user!'});
+    }
+});
+
+// delete classrooms (if they are inactive or any other issues that class may have!)
+router.delete('/classrooms/:id', ensureAuthenticated, isAdmin, async(req,res) => {
+    try {
+        await Classroom.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Classroom deleted'});
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to delete classroom' });
+    }
+});
+
+// check all users, students, teachers, classrooms
+router.get('/metrics', ensureAuthenticated, isAdmin, async(req,res) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalStudents = await User.countDocuments({ role: 'student'});
+        const totalTeachers = await User.countDocuments({ role: 'teacher'});
+        const totalClassrooms = await Classroom.countDocuments();
+        
+        res.json({ totalUsers, totalStudents, totalTeachers, totalClassrooms});
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch metrics!'});
+    }
+});
+
 // Here more functionalities will be implemented
 // Manage classrooms
 // deleting groups
