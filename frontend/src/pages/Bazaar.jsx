@@ -4,10 +4,12 @@ import axios from 'axios';
 import CreateBazaar from '../components/CreateBazaar';
 import AddItem from '../components/AddItem';
 
+// The bazzar will show in the bazaar link layer
 const Bazaar = () => {
   const { id: classroomId } = useParams();
   const [bazaars, setBazaars] = useState([]);
 
+  // fetching the bazaars based on the classrom the user is joined
   useEffect(() => {
     const fetchBazaars = async () => {
       try {
@@ -21,6 +23,7 @@ const Bazaar = () => {
   }, [classroomId]);
 
   return (
+    // Updated the css style with tailwindcss
     <div className="p-6 max-w-4xl mx-auto space-y-4">
       <h1 className="text-3xl font-bold">Bazaar</h1>
       <CreateBazaar classroomId={classroomId} />
